@@ -668,11 +668,10 @@
     </main>
 
 
-    <!-- ==================== 5. MODAL DETAIL JOURNEY (DENGAN TAMPILAN RESPONSIVE & TOMBOL X FIX HP) ==================== -->
+    <!-- ==================== 5. MODAL DETAIL JOURNEY ==================== -->
     <div id="journey-detail-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 md:p-6 hidden overflow-y-auto">
         <div class="bg-white dark:bg-apple-darkcard border border-apple-border dark:border-apple-darkborder rounded-3xl max-w-3xl w-full my-auto shadow-2xl overflow-hidden max-h-[92vh] flex flex-col relative">
             
-            <!-- Sticky Header Modal agar Tombol X Selalu Terlihat & Tidak Tergeser di HP -->
             <div class="flex justify-between items-center px-4 py-3 md:px-6 md:py-4 border-b border-apple-border dark:border-apple-darkborder bg-white/95 dark:bg-apple-darkcard/95 sticky top-0 z-30 backdrop-blur-md">
                 <div class="pr-3 overflow-hidden">
                     <span id="modal-journey-loc" class="text-[10px] md:text-xs font-mono text-emerald-600 font-semibold uppercase block truncate">...</span>
@@ -698,7 +697,7 @@
                     <div id="modal-slideshow-dots" class="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1.5 z-10"></div>
                 </div>
 
-                <!-- Action & Like Bar (Anti-Spam 1 User 1 Like) -->
+                <!-- Action & Like Bar -->
                 <div class="flex items-center justify-between border-y border-apple-border dark:border-apple-darkborder py-3 text-xs font-mono">
                     <div class="flex items-center gap-1 text-amber-500" id="modal-journey-stars"></div>
                     
@@ -707,7 +706,6 @@
                             <i class="fa-regular fa-heart" id="modal-like-icon"></i>
                             <span id="modal-journey-likes">0 Suka</span>
                         </button>
-                        <!-- Tombol Reset Like Khusus Admin -->
                         <button id="admin-reset-like-btn" onclick="adminResetJourneyLikes()" class="hidden px-2.5 py-1.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 text-[10px] font-bold" title="Reset/Hapus Like">
                             <i class="fa-solid fa-rotate-left mr-1"></i> Reset Like
                         </button>
@@ -736,7 +734,7 @@
                     </div>
                 </div>
 
-                <!-- Komentar & Balasan (Threaded Comments & Reply) -->
+                <!-- Komentar & Balasan -->
                 <div class="space-y-4 pt-2 border-t border-apple-border dark:border-apple-darkborder">
                     <div class="flex justify-between items-center">
                         <h4 class="font-jakarta font-bold text-xs md:text-sm">Diskusi Pengunjung</h4>
@@ -814,7 +812,7 @@
     </div>
 
 
-    <!-- ==================== 8. MODAL AUTHENTICATION ADMIN (USERNAME & PASSWORD / PIN) ==================== -->
+    <!-- ==================== 8. MODAL AUTHENTICATION ADMIN ==================== -->
     <div id="auth-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-apple-darkcard border border-apple-border dark:border-apple-darkborder rounded-3xl p-6 max-w-sm w-full text-center space-y-5 shadow-2xl">
             <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/50 text-apple-accent rounded-2xl flex items-center justify-center mx-auto text-xl">
@@ -1697,7 +1695,7 @@
         }
         type();
 
-        // 1. FUNGSI CLOSE INTRO MENGGUNAKAN SESSIONSTORAGE
+        // 1. FUNGSI CLOSE INTRO MENGGUNAKAN SESSIONSTORAGE & SELALU PINDAH KE HOME
         function closeIntro() {
             const intro = document.getElementById('intro-screen');
             if (intro) {
@@ -1705,6 +1703,10 @@
                 setTimeout(() => intro.style.display = 'none', 700);
             }
             sessionStorage.setItem('has_seen_intro_session', 'true');
+            
+            // Selalu set ke Home saat menekan Jelajahi Portofolio
+            switchTab('home', false);
+            history.replaceState({ tab: 'home' }, '', window.location.pathname);
         }
 
         function renderTabContent(tabId) {
@@ -1754,30 +1756,34 @@
             renderTabContent(targetTab);
         });
 
-        // 2. LOGIKA PEMUATAN INTRO SAAT HALAMAN DIBUKA ATAU DI-REFRESH
+        // 2. PEMUATAN HALAMAN SAAT DI-REFRESH VS TAB BARU DIBUKA
         window.addEventListener('DOMContentLoaded', () => {
             updateAdminVisibility();
-            const savedTab = window.location.hash.replace('#', '') || localStorage.getItem('active_tab') || 'home';
             
-            // Pengecekan sessionStorage
             const hasSeenIntroSession = sessionStorage.getItem('has_seen_intro_session');
 
             if (hasSeenIntroSession === 'true') {
+                // Jika hanya di-refresh (sesi berjalan), tetap di tab aktif terakhir
+                const savedTab = window.location.hash.replace('#', '') || localStorage.getItem('active_tab') || 'home';
                 const intro = document.getElementById('intro-screen');
                 if (intro) intro.style.display = 'none';
+
+                if (savedTab === 'admin' && (!isAdminLoggedIn || !isDashboardUnlocked)) {
+                    switchTab('home', false);
+                } else {
+                    switchTab(savedTab, false);
+                }
             } else {
+                // Jika tab baru dibuka, reset ke Home dan tampilkan Intro awal
+                localStorage.setItem('active_tab', 'home');
+                switchTab('home', false);
+                history.replaceState({ tab: 'home' }, '', window.location.pathname);
+
                 const intro = document.getElementById('intro-screen');
                 if (intro) {
                     intro.style.display = 'flex';
                     intro.style.opacity = '1';
                 }
-            }
-
-            if (savedTab === 'admin' && (!isAdminLoggedIn || !isDashboardUnlocked)) {
-                switchTab('home', false);
-            } else {
-                switchTab(savedTab, false);
-                history.replaceState({ tab: savedTab }, '', `#${savedTab}`);
             }
         });
 

@@ -1695,7 +1695,7 @@
         }
         type();
 
-        // 1. FUNGSI CLOSE INTRO MENGGUNAKAN SESSIONSTORAGE & SELALU PINDAH KE HOME
+        // 1. FUNGSI CLOSE INTRO MEMAKSA RESET KEMBALI KE HOME
         function closeIntro() {
             const intro = document.getElementById('intro-screen');
             if (intro) {
@@ -1704,7 +1704,11 @@
             }
             sessionStorage.setItem('has_seen_intro_session', 'true');
             
-            // Selalu set ke Home saat menekan Jelajahi Portofolio
+            // Hapus cache tab aktif & bersihkan URL Hash
+            localStorage.removeItem('active_tab');
+            window.location.hash = '';
+            
+            // Paksa pindahkan ke tab Home
             switchTab('home', false);
             history.replaceState({ tab: 'home' }, '', window.location.pathname);
         }
@@ -1756,14 +1760,14 @@
             renderTabContent(targetTab);
         });
 
-        // 2. PEMUATAN HALAMAN SAAT DI-REFRESH VS TAB BARU DIBUKA
+        // 2. LOGIKA INITIAL LOAD (REFRESH VS SESI BARU)
         window.addEventListener('DOMContentLoaded', () => {
             updateAdminVisibility();
             
             const hasSeenIntroSession = sessionStorage.getItem('has_seen_intro_session');
 
             if (hasSeenIntroSession === 'true') {
-                // Jika hanya di-refresh (sesi berjalan), tetap di tab aktif terakhir
+                // Saat di-refresh (sesi berjalan): Buka tab yang sedang aktif
                 const savedTab = window.location.hash.replace('#', '') || localStorage.getItem('active_tab') || 'home';
                 const intro = document.getElementById('intro-screen');
                 if (intro) intro.style.display = 'none';
@@ -1774,8 +1778,11 @@
                     switchTab(savedTab, false);
                 }
             } else {
-                // Jika tab baru dibuka, reset ke Home dan tampilkan Intro awal
-                localStorage.setItem('active_tab', 'home');
+                // Saat Sesi Baru (Tab/Browser baru ditutup lalu dibuka):
+                // Paksa bersihkan hash dan reset tab ke Home
+                localStorage.removeItem('active_tab');
+                window.location.hash = '';
+                
                 switchTab('home', false);
                 history.replaceState({ tab: 'home' }, '', window.location.pathname);
 

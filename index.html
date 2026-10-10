@@ -1014,7 +1014,6 @@
 
                 pubContainer.innerHTML += cardTemplate;
 
-                // Tampilan Admin dengan tombol Edit & Hapus
                 adminContainer.innerHTML += `
                     <div class="relative group">
                         ${cardTemplate}
@@ -1088,7 +1087,6 @@
 
                 pubContainer.innerHTML += cardHtml;
 
-                // Admin Preview & Controls
                 adminContainer.innerHTML += `
                     <div class="space-y-2">
                         ${cardHtml}
@@ -1109,7 +1107,6 @@
                 }
             });
 
-            // Update modal live data if currently active
             if(activeJourneyId && journeyCache[activeJourneyId]) {
                 const activeJ = journeyCache[activeJourneyId];
                 document.getElementById('modal-journey-likes').innerText = `${activeJ.likes || 0} Suka`;
@@ -1133,7 +1130,6 @@
             document.getElementById('modal-journey-desc').innerText = j.desc || 'Belum ada catatan.';
             document.getElementById('modal-journey-tips').innerText = j.tips || 'Tidak ada tips khusus.';
 
-            // Tombol Admin Reset Like
             const adminResetBtn = document.getElementById('admin-reset-like-btn');
             if (localStorage.getItem('admin_logged_in') === 'true') {
                 adminResetBtn.classList.remove('hidden');
@@ -1141,7 +1137,6 @@
                 adminResetBtn.classList.add('hidden');
             }
 
-            // Status Like per Device (1 Device 1 Like)
             updateLikeButtonStatus(id);
 
             const slider = document.getElementById('modal-slideshow-container');
@@ -1161,7 +1156,7 @@
             renderModalComments(j.comments || []);
 
             document.getElementById('journey-detail-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Kunci scroll background
+            document.body.style.overflow = 'hidden';
             updateModalSliderPosition();
         };
 
@@ -1194,7 +1189,6 @@
             }
         }
 
-        // SISTEM ANTI-SPAM LIKE (1 USER 1 LIKE TOGGLE)
         function updateLikeButtonStatus(id) {
             const hasLiked = localStorage.getItem(`liked_journey_${id}`) === 'true';
             const icon = document.getElementById('modal-like-icon');
@@ -1214,11 +1208,9 @@
             const hasLiked = localStorage.getItem(`liked_journey_${activeJourneyId}`) === 'true';
 
             if(hasLiked) {
-                // Unlike
                 await updateDoc(doc(db, "journey", activeJourneyId), { likes: increment(-1) });
                 localStorage.removeItem(`liked_journey_${activeJourneyId}`);
             } else {
-                // Like
                 await updateDoc(doc(db, "journey", activeJourneyId), { likes: increment(1) });
                 localStorage.setItem(`liked_journey_${activeJourneyId}`, 'true');
             }
@@ -1232,7 +1224,6 @@
             alert("✓ Like berhasil di-reset.");
         };
 
-        // REPLY & COMMENT SYSTEM
         window.replyToComment = (authorName) => {
             document.getElementById('input-comment-reply-to').value = authorName;
             document.getElementById('reply-indicator').classList.remove('hidden');
@@ -1690,7 +1681,7 @@
             alert("Berhasil Log Out dari Admin.");
         }
 
-        // TYPING EFFECT & TAB SWITCHING
+        // TYPING EFFECT
         const typingText = document.getElementById('typing-text');
         const phrases = ["Muhammad Raya Kasyafani", "Web Enthusiast", "Digital Traveler"];
         let phraseIdx = 0, charIdx = 0, isDeleting = false;
@@ -1706,11 +1697,14 @@
         }
         type();
 
+        // 1. FUNGSI CLOSE INTRO MENGGUNAKAN SESSIONSTORAGE
         function closeIntro() {
             const intro = document.getElementById('intro-screen');
-            intro.style.opacity = '0';
-            setTimeout(() => intro.style.display = 'none', 700);
-            localStorage.setItem('has_seen_intro', 'true');
+            if (intro) {
+                intro.style.opacity = '0';
+                setTimeout(() => intro.style.display = 'none', 700);
+            }
+            sessionStorage.setItem('has_seen_intro_session', 'true');
         }
 
         function renderTabContent(tabId) {
@@ -1760,14 +1754,23 @@
             renderTabContent(targetTab);
         });
 
+        // 2. LOGIKA PEMUATAN INTRO SAAT HALAMAN DIBUKA ATAU DI-REFRESH
         window.addEventListener('DOMContentLoaded', () => {
             updateAdminVisibility();
             const savedTab = window.location.hash.replace('#', '') || localStorage.getItem('active_tab') || 'home';
-            const hasSeenIntro = localStorage.getItem('has_seen_intro');
+            
+            // Pengecekan sessionStorage
+            const hasSeenIntroSession = sessionStorage.getItem('has_seen_intro_session');
 
-            if (hasSeenIntro === 'true') {
+            if (hasSeenIntroSession === 'true') {
                 const intro = document.getElementById('intro-screen');
                 if (intro) intro.style.display = 'none';
+            } else {
+                const intro = document.getElementById('intro-screen');
+                if (intro) {
+                    intro.style.display = 'flex';
+                    intro.style.opacity = '1';
+                }
             }
 
             if (savedTab === 'admin' && (!isAdminLoggedIn || !isDashboardUnlocked)) {

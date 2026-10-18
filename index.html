@@ -300,7 +300,7 @@
                             <span class="text-[10px] font-mono uppercase text-apple-subtext tracking-wider">MY PROJECTS</span>
                             <h3 class="font-jakarta text-base md:text-lg font-bold group-hover:text-purple-600 transition-colors">Karya & Portfolio</h3>
                         </div>
-                        <p class="text-apple-subtext text-xs leading-relaxed">Kumpulan proyek karya .</p>
+                        <p class="text-apple-subtext text-xs leading-relaxed">Kumpulan proyek karya.</p>
                     </div>
 
                     <div onclick="switchTab('journey')" class="bg-white dark:bg-apple-darkcard border border-apple-border dark:border-apple-darkborder rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer group space-y-3">
@@ -851,7 +851,7 @@
     <!-- ==================== CROPPER.JS ==================== -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-    <!-- ==================== FIREBASE SDK ==================== -->
+    <!-- ==================== FIREBASE SDK & GLOBAL SCRIPTS ==================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc, collection, addDoc, deleteDoc, updateDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1488,12 +1488,10 @@
                 await deleteDoc(doc(db, coll, id));
             }
         };
-    </script>
 
-    <script>
-        // MOBILE NAV DRAWER TOGGLE
+        // EXPOSE FUNCTIONS TO WINDOW OBJECT FOR INLINE ONCLICK LISTENERS
         let isMobileNavOpen = false;
-        function toggleMobileNav() {
+        window.toggleMobileNav = function() {
             isMobileNavOpen = !isMobileNavOpen;
             const drawer = document.getElementById('mobile-menu-drawer');
             const icon = document.getElementById('mobile-nav-icon');
@@ -1505,30 +1503,28 @@
                 drawer.classList.remove('open');
                 icon.className = "fa-solid fa-bars text-sm";
             }
-        }
+        };
 
-        function switchTabMobile(tabId) {
-            switchTab(tabId);
-            if(isMobileNavOpen) toggleMobileNav();
-        }
+        window.switchTabMobile = function(tabId) {
+            window.switchTab(tabId);
+            if(isMobileNavOpen) window.toggleMobileNav();
+        };
 
-        function openAdminTabMobile() {
-            openAdminTab();
-            if(isMobileNavOpen) toggleMobileNav();
-        }
+        window.openAdminTabMobile = function() {
+            window.openAdminTab();
+            if(isMobileNavOpen) window.toggleMobileNav();
+        };
 
-        // SIDEBAR TOGGLE DESKTOP
         let isCompact = false;
-        function toggleSidebarCompact() {
+        window.toggleSidebarCompact = function() {
             isCompact = !isCompact;
             document.body.classList.toggle('sidebar-compact', isCompact);
             const icon = document.getElementById('sidebar-toggle-icon');
             if (icon) icon.className = isCompact ? "fa-solid fa-angles-right text-xs" : "fa-solid fa-angles-left text-xs";
-        }
+        };
 
-        // CROPPER.JS LOGIC
         let cropperInstance = null;
-        function openCropperModal() {
+        window.openCropperModal = function() {
             const rawMedia = document.getElementById('add-journey-media').value;
             const firstUrl = rawMedia.split(/[\n,]+/)[0];
             if(!firstUrl) return alert("Masukkan minimal satu URL Gambar di kolom media terlebih dahulu!");
@@ -1539,47 +1535,46 @@
 
             if(cropperInstance) cropperInstance.destroy();
             cropperInstance = new Cropper(targetImg, { aspectRatio: 16 / 9, viewMode: 1 });
-        }
+        };
 
-        function closeCropperModal() {
+        window.closeCropperModal = function() {
             document.getElementById('cropper-modal').classList.add('hidden');
             if(cropperInstance) cropperInstance.destroy();
-        }
+        };
 
-        function cropperZoom(val) { if(cropperInstance) cropperInstance.zoom(val); }
-        function cropperRotate(deg) { if(cropperInstance) cropperInstance.rotate(deg); }
+        window.cropperZoom = function(val) { if(cropperInstance) cropperInstance.zoom(val); };
+        window.cropperRotate = function(deg) { if(cropperInstance) cropperInstance.rotate(deg); };
 
-        function applyCroppedImage() {
+        window.applyCroppedImage = function() {
             if(!cropperInstance) return;
             const canvas = cropperInstance.getCroppedCanvas({ width: 800, height: 450 });
             document.getElementById('add-journey-media').value = canvas.toDataURL('image/jpeg');
-            closeCropperModal();
+            window.closeCropperModal();
             alert("✓ Gambar berhasil di-crop!");
-        }
+        };
 
-        // OTENTIKASI ADMIN
         let isAdminLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
         let isDashboardUnlocked = localStorage.getItem('admin_unlocked') === 'true';
 
         document.addEventListener('keydown', (e) => {
             if (e.altKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-                openAdminTab();
+                window.openAdminTab();
             }
         });
 
         let logoClickCount = 0;
         let logoClickTimer = null;
-        function handleLogoClick(e) {
+        window.handleLogoClick = function(e) {
             e.preventDefault();
             logoClickCount++;
             clearTimeout(logoClickTimer);
             if (logoClickCount >= 3) {
                 logoClickCount = 0;
-                openAdminTab();
+                window.openAdminTab();
             } else {
                 logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 1000);
             }
-        }
+        };
 
         function updateAdminVisibility() {
             const adminBtn = document.getElementById('nav-admin');
@@ -1594,14 +1589,14 @@
             }
         }
 
-        function openAdminTab() {
+        window.openAdminTab = function() {
             updateAdminVisibility();
             if (isAdminLoggedIn && isDashboardUnlocked) {
-                switchTab('admin');
+                window.switchTab('admin');
             } else {
                 showAuthModal();
             }
-        }
+        };
 
         function showAuthModal() {
             const modal = document.getElementById('auth-modal');
@@ -1625,13 +1620,13 @@
             }
         }
 
-        function closeAdminAuth() {
+        window.closeAdminAuth = function() {
             document.getElementById('auth-modal').classList.add('hidden');
             document.getElementById('full-login-error').classList.add('hidden');
             document.getElementById('pin-login-error').classList.add('hidden');
-        }
+        };
 
-        function handleFullLogin(e) {
+        window.handleFullLogin = function(e) {
             e.preventDefault();
             const u = document.getElementById('admin-user').value;
             const p = document.getElementById('admin-pass').value;
@@ -1641,45 +1636,45 @@
                 isDashboardUnlocked = true;
                 localStorage.setItem('admin_logged_in', 'true');
                 localStorage.setItem('admin_unlocked', 'true');
-                closeAdminAuth();
+                window.closeAdminAuth();
                 updateAdminVisibility();
-                switchTab('admin');
+                window.switchTab('admin');
             } else {
                 document.getElementById('full-login-error').classList.remove('hidden');
             }
-        }
+        };
 
-        function handlePinUnlock(e) {
+        window.handlePinUnlock = function(e) {
             e.preventDefault();
             const pin = document.getElementById('admin-pin').value;
 
             if (pin === '1234') {
                 isDashboardUnlocked = true;
                 localStorage.setItem('admin_unlocked', 'true');
-                closeAdminAuth();
-                switchTab('admin');
+                window.closeAdminAuth();
+                window.switchTab('admin');
             } else {
                 document.getElementById('pin-login-error').classList.remove('hidden');
             }
-        }
+        };
 
-        function lockAdminTab() {
+        window.lockAdminTab = function() {
             isDashboardUnlocked = false;
             localStorage.setItem('admin_unlocked', 'false');
-            switchTab('home');
+            window.switchTab('home');
             alert("Dashboard Admin dikunci. Masukkan PIN untuk membuka kembali.");
-        }
+        };
 
-        function logoutAdmin() {
+        window.logoutAdmin = function() {
             isAdminLoggedIn = false;
             isDashboardUnlocked = false;
             localStorage.removeItem('admin_logged_in');
             localStorage.removeItem('admin_unlocked');
-            closeAdminAuth();
+            window.closeAdminAuth();
             updateAdminVisibility();
-            switchTab('home');
+            window.switchTab('home');
             alert("Berhasil Log Out dari Admin.");
-        }
+        };
 
         // TYPING EFFECT
         const typingText = document.getElementById('typing-text');
@@ -1697,8 +1692,7 @@
         }
         type();
 
-        // 1. FUNGSI CLOSE INTRO MEMAKSA RESET KEMBALI KE HOME
-        function closeIntro() {
+        window.closeIntro = function() {
             const intro = document.getElementById('intro-screen');
             if (intro) {
                 intro.style.opacity = '0';
@@ -1706,14 +1700,12 @@
             }
             sessionStorage.setItem('has_seen_intro_session', 'true');
             
-            // Hapus cache tab aktif & bersihkan URL Hash
             localStorage.removeItem('active_tab');
             window.location.hash = '';
             
-            // Paksa pindahkan ke tab Home
-            switchTab('home', false);
+            window.switchTab('home', false);
             history.replaceState({ tab: 'home' }, '', window.location.pathname);
-        }
+        };
 
         function renderTabContent(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1743,7 +1735,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function switchTab(tabId, pushToHistory = true) {
+        window.switchTab = function(tabId, pushToHistory = true) {
             renderTabContent(tabId);
             if (pushToHistory) {
                 const currentHash = window.location.hash.replace('#', '');
@@ -1751,7 +1743,7 @@
                     history.pushState({ tab: tabId }, '', `#${tabId}`);
                 }
             }
-        }
+        };
 
         window.addEventListener('popstate', (e) => {
             let targetTab = 'home';
@@ -1762,30 +1754,26 @@
             renderTabContent(targetTab);
         });
 
-        // 2. LOGIKA INITIAL LOAD (REFRESH VS SESI BARU)
         window.addEventListener('DOMContentLoaded', () => {
             updateAdminVisibility();
             
             const hasSeenIntroSession = sessionStorage.getItem('has_seen_intro_session');
 
             if (hasSeenIntroSession === 'true') {
-                // Saat di-refresh (sesi berjalan): Buka tab yang sedang aktif
                 const savedTab = window.location.hash.replace('#', '') || localStorage.getItem('active_tab') || 'home';
                 const intro = document.getElementById('intro-screen');
                 if (intro) intro.style.display = 'none';
 
                 if (savedTab === 'admin' && (!isAdminLoggedIn || !isDashboardUnlocked)) {
-                    switchTab('home', false);
+                    window.switchTab('home', false);
                 } else {
-                    switchTab(savedTab, false);
+                    window.switchTab(savedTab, false);
                 }
             } else {
-                // Saat Sesi Baru (Tab/Browser baru ditutup lalu dibuka):
-                // Paksa bersihkan hash dan reset tab ke Home
                 localStorage.removeItem('active_tab');
                 window.location.hash = '';
                 
-                switchTab('home', false);
+                window.switchTab('home', false);
                 history.replaceState({ tab: 'home' }, '', window.location.pathname);
 
                 const intro = document.getElementById('intro-screen');
@@ -1796,7 +1784,7 @@
             }
         });
 
-        function switchAdminSubtab(subId) {
+        window.switchAdminSubtab = function(subId) {
             document.querySelectorAll('.admin-subtab').forEach(st => st.classList.remove('active'));
             document.querySelectorAll('.subnav-btn').forEach(btn => {
                 btn.classList.remove('bg-apple-accent', 'text-white', 'font-semibold');
@@ -1807,17 +1795,17 @@
             const activeSub = document.getElementById(`subnav-${subId}`);
             activeSub.classList.add('bg-apple-accent', 'text-white', 'font-semibold');
             activeSub.classList.remove('text-apple-subtext');
-        }
+        };
 
-        function openVisitorSettings() { document.getElementById('visitor-settings-modal').classList.remove('hidden'); }
-        function closeVisitorSettings() { document.getElementById('visitor-settings-modal').classList.add('hidden'); }
+        window.openVisitorSettings = function() { document.getElementById('visitor-settings-modal').classList.remove('hidden'); };
+        window.closeVisitorSettings = function() { document.getElementById('visitor-settings-modal').classList.add('hidden'); };
 
-        function setTheme(mode) {
+        window.setTheme = function(mode) {
             if(mode === 'dark') document.documentElement.classList.add('dark');
             else document.documentElement.classList.remove('dark');
-        }
+        };
 
-        async function handleContactSubmit(e) {
+        window.handleContactSubmit = async function(e) {
             e.preventDefault();
             const form = e.target;
             const status = document.getElementById('contact-status');
@@ -1843,7 +1831,7 @@
                 status.innerText = "✓ Pesan berhasil dikirim!";
                 form.reset();
             } finally { btn.disabled = false; }
-        }
+        };
     </script>
 </body>
 </html>

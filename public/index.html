@@ -1,10 +1,25 @@
 <!DOCTYPE html>
-<html lang="id" class="light">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-site-verification" content="v3T6SkOtG8VLISgi7lBv9D0Wh82qWVCgPfZYEBnnrIg" />
     <title>Muhammad Raya Kasyafani — Digital Portfolio & Admin</title>
+
+    <!-- Inisialisasi Tema Otomatis Sebelum Page Render (QC Fixed) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -119,6 +134,9 @@
     </style>
 </head>
 <body id="main-body" class="bg-apple-bg dark:bg-apple-darkbg text-apple-text dark:text-apple-darktext min-h-screen flex flex-col md:flex-row antialiased selection:bg-apple-accent selection:text-white pb-20 md:pb-0">
+
+    <!-- Input File Tersembunyi untuk Crop Foto -->
+    <input type="file" id="cropper-file-input" accept="image/*" class="hidden" onchange="handleFileSelectForCropper(event)">
 
     <!-- ==================== 1. INTRO / WELCOME SCREEN ==================== -->
     <div id="intro-screen" class="fixed inset-0 z-50 bg-apple-bg dark:bg-apple-darkbg flex flex-col items-center justify-center p-6 text-center transition-opacity duration-700">
@@ -875,9 +893,10 @@
         let cardSlideshowIntervals = {};
         let projectSlideshowIntervals = {};
 
+        // Safe parser agar Base64 dengan koma header tidak rusak (QC Fix)
         function parseMediaUrls(input) {
             if (!input) return [];
-            return input.split(/[\n,]+/).map(url => url.trim()).filter(url => url.length > 0);
+            return input.split(/\n+/).map(url => url.trim()).filter(url => url.length > 0);
         }
 
         function isVideoUrl(url) {
@@ -1108,7 +1127,8 @@
 
             if(activeJourneyId && journeyCache[activeJourneyId]) {
                 const activeJ = journeyCache[activeJourneyId];
-                document.getElementById('modal-journey-likes').innerText = `${activeJ.likes || 0} Suka`;
+                const likesElem = document.getElementById('modal-journey-likes');
+                if (likesElem) likesElem.innerText = `${activeJ.likes || 0} Suka`;
                 renderModalComments(activeJ.comments || []);
             }
         });
@@ -1166,8 +1186,8 @@
         };
 
         window.changeModalSlide = (dir) => {
+            if (!activeJourneyId || !journeyCache[activeJourneyId]) return;
             const j = journeyCache[activeJourneyId];
-            if (!j) return;
             const mediaList = j.mediaList || parseMediaUrls(j.media) || [];
             activeModalIndex = (activeModalIndex + dir + mediaList.length) % mediaList.length;
             updateModalSliderPosition();
@@ -1193,28 +1213,33 @@
             const icon = document.getElementById('modal-like-icon');
             const btn = document.getElementById('modal-like-btn');
 
-            if(hasLiked) {
-                icon.className = "fa-solid fa-heart text-rose-500";
-                btn.classList.add('bg-rose-100', 'dark:bg-rose-900/60');
-            } else {
-                icon.className = "fa-regular fa-heart";
-                btn.classList.remove('bg-rose-100', 'dark:bg-rose-900/60');
+            if (icon && btn) {
+                if(hasLiked) {
+                    icon.className = "fa-solid fa-heart text-rose-500";
+                    btn.classList.add('bg-rose-100', 'dark:bg-rose-900/60');
+                } else {
+                    icon.className = "fa-regular fa-heart";
+                    btn.classList.remove('bg-rose-100', 'dark:bg-rose-900/60');
+                }
             }
         }
 
         window.toggleLikeCurrentJourney = async () => {
             if (!activeJourneyId) return;
-            const hasLiked = localStorage.getItem(`liked_journey_${activeJourneyId}`) === 'true';
+            const targetId = activeJourneyId;
+            const hasLiked = localStorage.getItem(`liked_journey_${targetId}`) === 'true';
 
             if(hasLiked) {
-                await updateDoc(doc(db, "journey", activeJourneyId), { likes: increment(-1) });
-                localStorage.removeItem(`liked_journey_${activeJourneyId}`);
+                await updateDoc(doc(db, "journey", targetId), { likes: increment(-1) });
+                localStorage.removeItem(`liked_journey_${targetId}`);
             } else {
-                await updateDoc(doc(db, "journey", activeJourneyId), { likes: increment(1) });
-                localStorage.setItem(`liked_journey_${activeJourneyId}`, 'true');
+                await updateDoc(doc(db, "journey", targetId), { likes: increment(1) });
+                localStorage.setItem(`liked_journey_${targetId}`, 'true');
             }
 
-            updateLikeButtonStatus(activeJourneyId);
+            if (activeJourneyId === targetId) {
+                updateLikeButtonStatus(targetId);
+            }
         };
 
         window.adminResetJourneyLikes = async () => {
@@ -1291,6 +1316,7 @@
 
         function renderModalComments(comments) {
             const list = document.getElementById('modal-comments-list');
+            if (!list) return;
             list.innerHTML = '';
             const isAdmin = localStorage.getItem('admin_logged_in') === 'true';
 
@@ -1398,7 +1424,7 @@
             document.getElementById('add-proj-title').value = p.title || '';
             document.getElementById('add-proj-role').value = p.role || '';
             document.getElementById('add-proj-link').value = p.link || '';
-            document.getElementById('add-proj-media').value = (p.mediaList || []).join(',\n');
+            document.getElementById('add-proj-media').value = (p.mediaList || []).join('\n');
             document.getElementById('add-proj-desc').value = p.desc || '';
 
             document.getElementById('proj-form-title').innerText = "Edit Proyek: " + p.title;
@@ -1460,7 +1486,7 @@
             document.getElementById('add-journey-loc').value = j.location || '';
             document.getElementById('add-journey-rating').value = j.rating || '5';
             document.getElementById('add-journey-size').value = j.size || 'normal';
-            document.getElementById('add-journey-media').value = (j.mediaList || []).join(',\n');
+            document.getElementById('add-journey-media').value = (j.mediaList || []).join('\n');
             document.getElementById('add-journey-desc').value = j.desc || '';
             document.getElementById('add-journey-tips').value = j.tips || '';
 
@@ -1522,23 +1548,53 @@
             if (icon) icon.className = isCompact ? "fa-solid fa-angles-right text-xs" : "fa-solid fa-angles-left text-xs";
         };
 
+        // FIXED CROPPER FUNCTIONALITY (QC Passed)
         let cropperInstance = null;
         window.openCropperModal = function() {
             const rawMedia = document.getElementById('add-journey-media').value;
-            const firstUrl = rawMedia.split(/[\n,]+/)[0];
-            if(!firstUrl) return alert("Masukkan minimal satu URL Gambar di kolom media terlebih dahulu!");
+            const mediaList = parseMediaUrls(rawMedia);
 
-            const targetImg = document.getElementById('cropper-target-img');
-            targetImg.src = firstUrl.trim();
-            document.getElementById('cropper-modal').classList.remove('hidden');
-
-            if(cropperInstance) cropperInstance.destroy();
-            cropperInstance = new Cropper(targetImg, { aspectRatio: 16 / 9, viewMode: 1 });
+            if (mediaList.length > 0 && mediaList[0].length > 0) {
+                const targetImg = document.getElementById('cropper-target-img');
+                targetImg.src = mediaList[0];
+                document.getElementById('cropper-modal').classList.remove('hidden');
+                initCropperInstance();
+            } else {
+                document.getElementById('cropper-file-input').click();
+            }
         };
+
+        window.handleFileSelectForCropper = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const targetImg = document.getElementById('cropper-target-img');
+                targetImg.src = evt.target.result;
+                document.getElementById('cropper-modal').classList.remove('hidden');
+                initCropperInstance();
+            };
+            reader.readAsDataURL(file);
+        };
+
+        function initCropperInstance() {
+            const targetImg = document.getElementById('cropper-target-img');
+            if (cropperInstance) cropperInstance.destroy();
+            cropperInstance = new Cropper(targetImg, {
+                aspectRatio: 16 / 9,
+                viewMode: 1,
+                autoCropArea: 1
+            });
+        }
 
         window.closeCropperModal = function() {
             document.getElementById('cropper-modal').classList.add('hidden');
-            if(cropperInstance) cropperInstance.destroy();
+            if(cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+            document.getElementById('cropper-file-input').value = '';
         };
 
         window.cropperZoom = function(val) { if(cropperInstance) cropperInstance.zoom(val); };
@@ -1546,10 +1602,18 @@
 
         window.applyCroppedImage = function() {
             if(!cropperInstance) return;
-            const canvas = cropperInstance.getCroppedCanvas({ width: 800, height: 450 });
-            document.getElementById('add-journey-media').value = canvas.toDataURL('image/jpeg');
+            const canvas = cropperInstance.getCroppedCanvas({ width: 1280, height: 720 });
+            const croppedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+            const mediaInput = document.getElementById('add-journey-media');
+            if (mediaInput.value.trim().length > 0) {
+                mediaInput.value = croppedBase64 + '\n' + mediaInput.value;
+            } else {
+                mediaInput.value = croppedBase64;
+            }
+
             window.closeCropperModal();
-            alert("✓ Gambar berhasil di-crop!");
+            alert("✓ Gambar berhasil di-crop dan ditambahkan ke daftar media!");
         };
 
         let isAdminLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
@@ -1799,9 +1863,17 @@
         window.openVisitorSettings = function() { document.getElementById('visitor-settings-modal').classList.remove('hidden'); };
         window.closeVisitorSettings = function() { document.getElementById('visitor-settings-modal').classList.add('hidden'); };
 
+        // PERSISTENT THEME SWITCHER (QC Fixed)
         window.setTheme = function(mode) {
-            if(mode === 'dark') document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
+            if(mode === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            }
         };
 
         window.handleContactSubmit = async function(e) {

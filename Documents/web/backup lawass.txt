@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Raya Kasyafani — Portfolio & Travel Logs</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0e0e0e',
+                            dark: '#141414',
+                            surface: '#1b1b1b',
+                            border: 'rgba(255, 255, 255, 0.1)',
+                            cream: '#f4efe6',
+                            muted: '#8e8e93'
+                        }
+                    },
+                    fontFamily: {
+                        syne: ['Syne', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0e0e0e;
+            color: #f4efe6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .font-syne { font-family: 'Syne', sans-serif; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0e0e0e; }
+        ::-webkit-scrollbar-thumb { background: #222222; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f4efe6; }
+
+        /* Drawer Overlay Slide Effect */
+        .drawer {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .drawer-closed {
+            transform: translateX(100%);
+        }
+        .drawer-open {
+            transform: translateX(0);
+        }
+
+        /* Image grayscale hover transition */
+        .img-hover {
+            filter: grayscale(100%);
+            transition: filter 0.5s ease, transform 0.5s ease;
+        }
+        .img-hover:hover {
+            filter: grayscale(0%);
+            transform: scale(1.02);
+        }
+
+        /* Hero Background Slideshow & Video Animation */
+        .bg-media {
+            transition: opacity 1.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="relative selection:bg-brand-cream selection:text-brand-black">
+
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute inset-0 bg-black/75 z-10"></div>
+
+        <div id="hero-slideshow" class="w-full h-full relative z-0">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80" class="bg-media absolute inset-0 w-full h-full object-cover opacity-100" alt="Slide 1">
+            <img src="https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&w=1920&q=80" class="bg-media absolute inset-0 w-full h-full object-cover opacity-0" alt="Slide 2">
+            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1920&q=80" class="bg-media absolute inset-0 w-full h-full object-cover opacity-0" alt="Slide 3">
+        </div>
+
+        <div id="hero-video-container" class="bg-media absolute inset-0 w-full h-full opacity-0 z-0">
+            <video id="hero-video" class="w-full h-full object-cover" muted playsinline loop>
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-water-1164-large.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <header class="fixed top-0 left-0 w-full z-40 bg-brand-black/60 backdrop-blur-md border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#" class="font-syne text-lg font-bold tracking-tight uppercase">
+                Muhammad Raya Kasyafani <span class="text-brand-muted font-normal text-xs ml-2">// 2026</span>
+            </a>
+
+            <nav class="hidden md:flex items-center space-x-10 text-xs font-mono uppercase tracking-widest text-brand-muted">
+                <button onclick="openDrawer('about-drawer')" class="hover:text-brand-cream transition-colors">ABOUT ME</button>
+                <button onclick="openDrawer('travel-drawer')" class="hover:text-brand-cream transition-colors">MY JOURNEY</button>
+                <button onclick="openDrawer('contact-drawer')" class="hover:text-brand-cream transition-colors">CONTACT</button>
+            </nav>
+
+            <button onclick="openDrawer('menu-drawer')" class="md:hidden text-xs font-mono uppercase tracking-widest text-brand-cream">
+                [ Menu ]
+            </button>
+        </div>
+    </header>
+
+    <main class="relative z-20 min-h-screen pt-32 pb-20 flex flex-col justify-between max-w-7xl mx-auto px-6">
+        
+        <div class="space-y-12 my-auto">
+            <div class="inline-flex items-center gap-2 border border-brand-border px-3 py-1 rounded-full text-xs font-mono text-brand-muted uppercase tracking-widest backdrop-blur-md bg-black/30">
+                <span id="media-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="media-status-text">[SLIDESHOW] Welcome and Enjoy!</span>
+            </div>
+
+            <h1 class="font-syne text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter uppercase leading-[0.9]">
+                Eksplorasi <br>
+                <span class="text-brand-cream/70 font-light italic">Tanpa Batas.</span>
+            </h1>
+
+            <div class="grid md:grid-cols-2 gap-8 pt-8 border-t border-brand-border max-w-4xl">
+                <p class="text-brand-muted text-sm leading-relaxed backdrop-blur-sm bg-black/20 p-2 rounded">
+                    Selamat datang di portofolio digital saya. Tempat di mana saya mencatat perjalanan, pemikiran, serta eksplorasi tempat-tempat menarik di seluruh Indonesia.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    <button onclick="openDrawer('about-drawer')" class="px-6 py-3 bg-brand-cream text-brand-black font-syne text-xs font-bold uppercase tracking-wider hover:bg-white transition-all">
+                        Mengenal Lebih Dekat <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                    <button onclick="openDrawer('contact-drawer')" class="px-6 py-3 border border-brand-border text-brand-cream font-syne text-xs font-bold uppercase tracking-wider hover:border-brand-cream transition-all backdrop-blur-sm">
+                        Kirim Pesan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12 border-t border-brand-border text-xs font-mono text-brand-muted">
+            <div>
+                <span class="block text-white font-bold">LOKASI DOMISILI</span>
+                <span>Jember, Jawa Timur</span>
+            </div>
+            <div>
+                <span class="block text-white font-bold">KOTA KELAHIRAN</span>
+                <span>Bogor, Jawa Barat</span>
+            </div>
+            <div>
+                <span class="block text-white font-bold">KOTA DIKUNJUNGI</span>
+                <span>22+ Kota</span>
+            </div>
+            <div>
+                <span class="block text-white font-bold">STATUS</span>
+                <span>Siswa SMA</span>
+            </div>
+        </div>
+    </main>
+
+    <div id="about-drawer" class="drawer drawer-closed fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
+        <div class="w-full max-w-3xl h-full bg-brand-dark border-l border-brand-border p-8 md:p-12 overflow-y-auto space-y-12 flex flex-col justify-between">
+            
+            <div class="space-y-10">
+                <div class="flex items-center justify-between border-b border-brand-border pb-6 sticky top-0 bg-brand-dark z-10">
+                    <span class="text-xs font-mono text-brand-muted uppercase">ABOUT ME</span>
+                    <button onclick="closeDrawer('about-drawer')" class="text-brand-muted hover:text-white text-sm font-mono uppercase">
+                        [ ✕ ]
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 items-start">
+                    <div class="aspect-[4/5] rounded-lg overflow-hidden border border-brand-border md:col-span-1">
+                        <img src="https://i.ibb.co.com/5gny0nQZ/0159804475.jpg" alt="Muhammad Raya Kasyafani" class="w-full h-full object-cover img-hover">
+                    </div>
+                    <div class="space-y-4 md:col-span-2">
+                        <h2 class="font-syne text-3xl font-bold uppercase tracking-tight">Muhammad Raya Kasyafani</h2>
+                        <p class="text-brand-cream text-xs font-mono uppercase tracking-widest text-brand-muted">Student | Traveler</p>
+                        
+                        <div class="border-t border-brand-border pt-4 space-y-2 text-xs font-mono">
+                            <div class="flex justify-between py-1 border-b border-brand-border/40">
+                                <span class="text-brand-muted">Nama Lengkap</span>
+                                <span class="text-white">Muhammad Raya Kasyafani</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-brand-border/40">
+                                <span class="text-brand-muted">TTL</span>
+                                <span class="text-white">Bogor, 30 Juli 2008</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-brand-border/40">
+                                <span class="text-brand-muted">Jenis Kelamin</span>
+                                <span class="text-white">Laki-Laki</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-brand-border/40">
+                                <span class="text-brand-muted">Status</span>
+                                <span class="text-white">Pelajar Sekolah Menengah Atas</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 pt-2 text-xs font-mono">
+                            <a href="mailto:rayakasyafani2021@gmail.com" class="px-3 py-1.5 border border-brand-border rounded hover:bg-brand-surface transition-colors"><i class="fa-solid fa-envelope mr-1.5"></i> Email</a>
+                            <a href="https://linkedin.com" target="_blank" class="px-3 py-1.5 border border-brand-border rounded hover:bg-brand-surface transition-colors"><i class="fa-brands fa-linkedin mr-1.5"></i> LinkedIn</a>
+                            <a href="https://github.com" target="_blank" class="px-3 py-1.5 border border-brand-border rounded hover:bg-brand-surface transition-colors"><i class="fa-brands fa-github mr-1.5"></i> GitHub</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 border-t border-brand-border pt-8">
+                    <h3 class="font-syne text-lg font-bold uppercase tracking-wider text-brand-cream">Ringkasan Profesional</h3>
+                    <p class="text-brand-muted text-xs leading-relaxed">
+                        Saya adalah seorang siswa SMA yang memiliki ketertarikan mendalam pada eksplorasi teknologi serta dokumentasi perjalanan visual. Berfokus pada pengembangan soft dan hard skill secara bertahap. Selalu terdorong untuk mempelajari tantangan baru dan mengabadikan pengalaman eksplorasi di berbagai daerah di Indonesia.
+                    </p>
+                </div>
+
+                <div class="space-y-4 border-t border-brand-border pt-8">
+                    <h3 class="font-syne text-lg font-bold uppercase tracking-wider text-brand-cream">Keterampilan Utama</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+                        <div class="bg-brand-surface border border-brand-border p-4 rounded space-y-2">
+                            <span class="text-white font-bold block"><i class="fa-solid fa-code text-brand-muted mr-2"></i> Hard Skills </span>
+                            <ul class="text-brand-muted space-y-1 list-disc list-inside">
+                                <li>Foto & Video Editing</li>
+                                <li>Microsoft Office Suite</li>
+                                <li>Computer Aided Design (CAD)</li>
+                                <li>Fotografi & Videografi</li>
+                            </ul>
+                        </div>
+                        <div class="bg-brand-surface border border-brand-border p-4 rounded space-y-2">
+                            <span class="text-white font-bold block"><i class="fa-solid fa-user-check text-brand-muted mr-2"></i> Soft Skills</span>
+                            <ul class="text-brand-muted space-y-1 list-disc list-inside">
+                                <li>Manajemen Waktu & Organisasi</li>
+                                <li>Komunikasi & Kerja Sama Tim</li>
+                                <li>Penyelesaian Masalah (Problem Solving)</li>
+                                <li>Kemampuan Adaptasi & Pembelajar Cepat</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 border-t border-brand-border pt-8">
+                    <h3 class="font-syne text-lg font-bold uppercase tracking-wider text-brand-cream">Koleksi Proyek / Karya</h3>
+                    <div class="space-y-4">
+                        <div class="bg-brand-surface border border-brand-border p-5 rounded space-y-2">
+                            <div class="flex justify-between items-center text-xs font-mono">
+                                <span class="text-white font-bold uppercase">01. Web Portofolio Editorial</span>
+                                <span class="text-brand-muted">Peran: Designer</span>
+                            </div>
+                            <p class="text-brand-muted text-xs leading-relaxed">
+                                Pengarsipan portofolio interaktif berbasis gaya minimalis Swiss/Editorial, dilengkapi dengan fitur slide-out drawer, integrasi form kontak direct email, dan sistem ulasan travel log.
+                            </p>
+                            <div class="text-[10px] font-mono text-brand-muted pt-1">Tech Stack: HTML, Tailwind CSS, JavaScript Vanilla</div>
+                        </div>
+
+                        <div class="bg-brand-surface border border-brand-border p-5 rounded space-y-2">
+                            <div class="flex justify-between items-center text-xs font-mono">
+                                <span class="text-white font-bold uppercase">02. Digital Travel Log Indonesia</span>
+                                <span class="text-brand-muted">Peran: Content Creator </span>
+                            </div>
+                            <p class="text-brand-muted text-xs leading-relaxed">
+                                Proyek dokumentasi perjalanan independen yang merangkum cerita visual, peta lokasi interaktif, serta panduan singkat untuk lebih dari 22 kota di Indonesia.
+                            </p>
+                            <div class="text-[10px] font-mono text-brand-muted pt-1">Tech Stack: Photography, Media Editing, Web Mapping</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 border-t border-brand-border pt-8">
+                    <h3 class="font-syne text-lg font-bold uppercase tracking-wider text-brand-cream">Pencapaian & Sertifikasi</h3>
+                    <ul class="space-y-2 text-xs font-mono text-brand-muted">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-award text-amber-400 mt-0.5"></i>
+                            <div>
+                                <strong class="text-white">Sertifikat Pemenang Lomba Desain Videografi</strong> — Online Competition (2023)
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-award text-amber-400 mt-0.5"></i>
+                            <div>
+                                <strong class="text-white">Sertifikasi Gemini untuk Siswa (Sekolah Dasar dan Menengah)</strong> — Pencapaian Sertifikasi Gemini (2026)
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="space-y-6 border-t border-brand-border pt-8">
+                    <h3 class="font-syne text-lg font-bold uppercase tracking-wider text-brand-cream">Peta Lokasi & Geografis</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-xs font-mono">
+                                <span class="text-white font-bold"><i class="fa-solid fa-map-pin text-red-500 mr-1.5"></i> Kota Kelahiran</span>
+                                <span class="text-brand-muted">Bogor, Jawa Barat</span>
+                            </div>
+                            <div class="aspect-video w-full rounded border border-brand-border overflow-hidden bg-brand-surface">
+                                <iframe class="w-full h-full grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300" src="https://maps.google.com/maps?q=Bogor,Indonesia&t=&z=12&ie=UTF8&iwloc=&output=embed" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                            </div>
+                            <p class="text-[11px] text-brand-muted leading-relaxed">
+                                Kota Bogor merupakan tempat lahir dan tumbuh awal saya sebelum melanjutkan perjalanan ke daerah lain.
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-xs font-mono">
+                                <span class="text-white font-bold"><i class="fa-solid fa-location-dot text-emerald-400 mr-1.5"></i> Domisili Saat Ini</span>
+                                <span class="text-brand-muted">Jember, Jawa Timur</span>
+                            </div>
+                            <div class="aspect-video w-full rounded border border-brand-border overflow-hidden bg-brand-surface">
+                                <iframe class="w-full h-full grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300" src="https://maps.google.com/maps?q=Jember,Indonesia&t=&z=12&ie=UTF8&iwloc=&output=embed" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                            </div>
+                            <p class="text-[11px] text-brand-muted leading-relaxed">
+                                Jember adalah kota tempat saya tinggal dan menempuh pendidikan sekolah menengah atas saat ini.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-8 border-t border-brand-border mt-8">
+                <button onclick="closeDrawer('about-drawer'); openDrawer('contact-drawer');" class="w-full text-center py-4 bg-brand-cream text-brand-black font-syne text-xs font-bold uppercase tracking-wider hover:bg-white transition-all">
+                    Hubungi Saya atau Kirim Pesan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="travel-drawer" class="drawer drawer-closed fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
+        <div class="w-full max-w-3xl h-full bg-brand-dark border-l border-brand-border p-8 md:p-12 overflow-y-auto space-y-10">
+            
+            <div class="flex items-center justify-between border-b border-brand-border pb-6 sticky top-0 bg-brand-dark z-10">
+                <span class="text-xs font-mono text-brand-muted uppercase">MY JOURNEY</span>
+                <button onclick="closeDrawer('travel-drawer')" class="text-brand-muted hover:text-white text-sm font-mono uppercase">
+                    [ ✕ ]
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="font-syne text-3xl font-bold uppercase">Daftar Tempat Dikunjungi</h2>
+                <p class="text-brand-muted text-xs">Klik pada kartu untuk membaca catatan lengkap, ulasan, atau memberi komentar.</p>
+            </div>
+
+            <div class="space-y-8">
+                <div class="bg-brand-surface border border-brand-border p-6 rounded-lg space-y-4" data-id="1">
+                    <div class="aspect-video overflow-hidden rounded border border-brand-border">
+                        <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80" alt="Petualangan 1" class="w-full h-full object-cover img-hover">
+                    </div>
+                    <div class="flex justify-between items-center text-xs font-mono text-brand-muted">
+                        <span><i class="fa-solid fa-location-dot mr-1"></i> Sydney, Australia</span>
+                        <span>15 Jan 2026</span>
+                    </div>
+                    <h3 class="font-syne text-xl font-bold uppercase">Menjelajahi Arsitektur Opera House</h3>
+                    <p class="text-brand-muted text-xs leading-relaxed">
+                        Pengalaman luar biasa menikmati matahari terbenam di sekitar Sydney Harbour. Arsitektur ikonik ini memberikan begitu banyak inspirasi visual.
+                    </p>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-brand-border/50 text-xs font-mono">
+                        <div class="flex items-center gap-1 text-amber-400">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="text-white font-bold ml-1">4.9</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button onclick="toggleLike(1)" class="like-btn text-brand-muted hover:text-white flex items-center gap-1">
+                                <i class="fa-regular fa-heart"></i>
+                                <span class="like-count">48</span>
+                            </button>
+                            <button onclick="openDetailModal(1)" class="text-brand-cream underline hover:text-white">
+                                Baca & Komentar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-surface border border-brand-border p-6 rounded-lg space-y-4" data-id="2">
+                    <div class="aspect-video overflow-hidden rounded border border-brand-border bg-black">
+                        <video class="w-full h-full object-cover" controls poster="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80">
+                            <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-water-1164-large.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="flex justify-between items-center text-xs font-mono text-brand-muted">
+                        <span><i class="fa-solid fa-location-dot mr-1"></i> Bali, Indonesia</span>
+                        <span>02 Feb 2026</span>
+                    </div>
+                    <h3 class="font-syne text-xl font-bold uppercase">Keindahan Pantai Melasti & Ombak Pantai</h3>
+                    <p class="text-brand-muted text-xs leading-relaxed">
+                        Menikmati irama ombak pantai Melasti saat sore hari. Salah satu tempat terbaik untuk menenangkan pikiran.
+                    </p>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-brand-border/50 text-xs font-mono">
+                        <div class="flex items-center gap-1 text-amber-400">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="text-white font-bold ml-1">5.0</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button onclick="toggleLike(2)" class="like-btn text-brand-muted hover:text-white flex items-center gap-1">
+                                <i class="fa-regular fa-heart"></i>
+                                <span class="like-count">95</span>
+                            </button>
+                            <button onclick="openDetailModal(2)" class="text-brand-cream underline hover:text-white">
+                                Baca & Komentar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact-drawer" class="drawer drawer-closed fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
+        <div class="w-full max-w-xl h-full bg-brand-dark border-l border-brand-border p-8 md:p-12 overflow-y-auto space-y-8 flex flex-col justify-between">
+            
+            <div class="space-y-6">
+                <div class="flex items-center justify-between border-b border-brand-border pb-6">
+                    <span class="text-xs font-mono text-brand-muted uppercase">CONTACT</span>
+                    <button onclick="closeDrawer('contact-drawer')" class="text-brand-muted hover:text-white text-sm font-mono uppercase">
+                        [ ✕ ]
+                    </button>
+                </div>
+
+                <div class="space-y-2">
+                    <h2 class="font-syne text-3xl font-bold uppercase">Kirim Pesan Langsung</h2>
+                    <p class="text-brand-muted text-xs leading-relaxed">
+                        Isi formulir di bawah ini untuk mengirimkan pesan, pertanyaan, atau ajakan berkolaborasi.
+                    </p>
+                </div>
+
+                <form id="direct-contact-form" onsubmit="handleContactSubmit(event)" action="https://formspree.io/f/xljgbnqy" method="POST" class="space-y-4 pt-2">
+                    <div class="space-y-1">
+                        <label class="text-xs font-mono text-brand-muted uppercase">Nama Lengkap</label>
+                        <input type="text" name="name" id="contact-name" placeholder="Masukkan nama Anda" required class="w-full bg-brand-surface border border-brand-border rounded p-3 text-xs text-white focus:outline-none focus:border-brand-cream">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-mono text-brand-muted uppercase">Alamat Email Anda</label>
+                        <input type="email" name="email" id="contact-email" placeholder="contoh@email.com" required class="w-full bg-brand-surface border border-brand-border rounded p-3 text-xs text-white focus:outline-none focus:border-brand-cream">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-mono text-brand-muted uppercase">Subjek / Judul Pesan</label>
+                        <input type="text" name="subject" id="contact-subject" placeholder="Subjek pesan" required class="w-full bg-brand-surface border border-brand-border rounded p-3 text-xs text-white focus:outline-none focus:border-brand-cream">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-mono text-brand-muted uppercase">Pesan / Pesan Komentar</label>
+                        <textarea name="message" id="contact-message" rows="5" placeholder="Tuliskan pesan Anda secara mendetail di sini..." required class="w-full bg-brand-surface border border-brand-border rounded p-3 text-xs text-white focus:outline-none focus:border-brand-cream"></textarea>
+                    </div>
+
+                    <div id="contact-status" class="hidden p-3 rounded text-xs font-mono"></div>
+
+                    <button type="submit" id="contact-submit-btn" class="w-full py-4 bg-brand-cream text-brand-black font-syne text-xs font-bold uppercase tracking-wider hover:bg-white transition-all">
+                        Kirim Pesan Ke Email <i class="fa-solid fa-paper-plane ml-2"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="pt-6 border-t border-brand-border text-xs font-mono text-brand-muted flex justify-between items-center">
+                <span>Email Langsung:</span>
+                <span class="text-white">rayakasyafani2021@gmail.com</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="menu-drawer" class="drawer drawer-closed fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-md">
+        <div class="w-full max-w-xs h-full bg-brand-dark p-8 space-y-8 flex flex-col justify-between">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center border-b border-brand-border pb-4">
+                    <span class="text-xs font-mono text-brand-muted">NAVIGATION</span>
+                    <button onclick="closeDrawer('menu-drawer')" class="text-xs font-mono text-white">[ ✕ ]</button>
+                </div>
+                <div class="flex flex-col space-y-6 text-lg font-syne font-bold uppercase">
+                    <button onclick="closeDrawer('menu-drawer'); openDrawer('about-drawer');" class="text-left hover:text-brand-muted">ABOUT ME</button>
+                    <button onclick="closeDrawer('menu-drawer'); openDrawer('travel-drawer');" class="text-left hover:text-brand-muted">MY JOURNEY</button>
+                    <button onclick="closeDrawer('menu-drawer'); openDrawer('contact-drawer');" class="text-left hover:text-brand-muted">CONTACT</button>
+                </div>
+            </div>
+            <p class="text-[10px] font-mono text-brand-muted">&copy; 2026 Muhammad Raya Kasyafani</p>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="bg-brand-dark border border-brand-border w-full max-w-2xl max-h-[85vh] rounded-lg p-6 md:p-8 overflow-y-auto space-y-6 relative">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-brand-muted hover:text-white font-mono text-xs">
+                [ ✕ ]
+            </button>
+
+            <div>
+                <span id="modal-location" class="text-xs font-mono text-brand-muted"></span>
+                <h3 id="modal-title" class="font-syne text-2xl font-bold uppercase mt-1"></h3>
+            </div>
+
+            <p id="modal-desc" class="text-brand-muted text-xs leading-relaxed border-b border-brand-border pb-4"></p>
+
+            <div class="space-y-4">
+                <h4 class="font-syne text-sm font-bold uppercase">Tulis Ulasan & Rating</h4>
+                <form onsubmit="submitComment(event)" class="space-y-3">
+                    <input type="text" id="user-name" placeholder="Nama Anda" required class="w-full bg-brand-surface border border-brand-border rounded p-3 text-xs text-white focus:outline-none focus:border-brand-cream">
+                    
+                    <div class="flex items-center gap-3 bg-brand-surface border border-brand-border rounded p-3">
+                        <span class="text-xs text-brand-muted font-mono">Rating:</span>
+                        <div id="star-input" class="flex gap-1 text-amber-400 text-xs">
+                            <i class="fa-regular fa-star cursor-pointer" onclick="setRating(1)"></i>
+                            <i class="fa-regular fa-star cursor-pointer" onclick="setRating(2)"></i>
+                            <i class="fa-regular fa-star cursor-pointer" onclick="setRating(3)"></i>
+                            <i class="fa-regular fa-star cursor-pointer" onclick="setRating(4)"></i>
+                            <i class="fa-regular fa-star cursor-pointer" onclick="setRating(5)"></i>
+                        </div>
+                    </div>
+
+                    <textarea id="user-comment" rows="3" placeholder="Ketik pesan atau respon Anda..." required class="w-full bg-brand-surface border border-brand-border rounded p-3 text-xs text-white focus:outline-none focus:border-brand-cream"></textarea>
+                    
+                    <button type="submit" class="px-6 py-2.5 bg-brand-cream text-brand-black font-syne text-xs font-bold uppercase hover:bg-white transition-all">
+                        Kirim Komentar
+                    </button>
+                </form>
+            </div>
+
+            <div class="space-y-3 pt-4 border-t border-brand-border">
+                <h4 class="font-syne text-xs font-bold uppercase text-brand-muted">Komentar Pengunjung</h4>
+                <div id="comments-list" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. SLIDESHOW & VIDEO BACKGROUND CONTROLLER ---
+        const slides = document.querySelectorAll('#hero-slideshow .bg-media');
+        const videoContainer = document.getElementById('hero-video-container');
+        const videoElement = document.getElementById('hero-video');
+        const statusText = document.getElementById('media-status-text');
+        
+        let currentSlide = 0;
+        let slideLoops = 0;
+        const maxLoops = 2; // Berapa putaran/siklus slideshow sebelum berganti ke Video
+        const slideIntervalTime = 3000; // Durasi perpindahan antar foto (3000ms = 3 detik)
+
+        let slideInterval = setInterval(nextSlide, slideIntervalTime);
+
+        function nextSlide() {
+            // Sembunyikan slide aktif saat ini
+            slides[currentSlide].style.opacity = '0';
+            
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            // Tampilkan slide berikutnya
+            slides[currentSlide].style.opacity = '1';
+
+            // Jika telah memutar semua slide satu siklus penuh
+            if (currentSlide === 0) {
+                slideLoops++;
+                // Jika sudah memenuhi batasan putaran (misal 2 siklus)
+                if (slideLoops >= maxLoops) {
+                    clearInterval(slideInterval);
+                    switchToVideo();
+                }
+            }
+        }
+
+        function switchToVideo() {
+            // Sembunyikan slideshow
+            document.getElementById('hero-slideshow').style.opacity = '0';
+            
+            // Tampilkan container video
+            videoContainer.style.opacity = '1';
+            
+            // Putar video
+            videoElement.play();
+            
+            // Update Teks Status
+            statusText.innerText = '[VIDEO BACKGROUND]our Journey Awaits!';
+        }
+
+
+        // --- 2. DRAWER CONTROLS ---
+        function openDrawer(id) {
+            document.getElementById(id).classList.remove('drawer-closed');
+            document.getElementById(id).classList.add('drawer-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer(id) {
+            document.getElementById(id).classList.remove('drawer-open');
+            document.getElementById(id).classList.add('drawer-closed');
+            document.body.style.overflow = 'auto';
+        }
+
+
+        // --- 3. DIRECT CONTACT FORM SUBMISSION ---
+        async function handleContactSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const statusDiv = document.getElementById('contact-status');
+            const submitBtn = document.getElementById('contact-submit-btn');
+
+            statusDiv.className = 'p-3 rounded text-xs font-mono bg-brand-surface border border-brand-border text-brand-cream block';
+            statusDiv.innerText = 'Mengirim pesan...';
+            submitBtn.disabled = true;
+
+            try {
+                const data = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    statusDiv.className = 'p-3 rounded text-xs font-mono bg-emerald-950 border border-emerald-500/50 text-emerald-300 block';
+                    statusDiv.innerText = '✓ Pesan Anda telah berhasil terkirim!';
+                    form.reset();
+                } else {
+                    statusDiv.className = 'p-3 rounded text-xs font-mono bg-emerald-950 border border-emerald-500/50 text-emerald-300 block';
+                    statusDiv.innerText = '✓ Pesan berhasil dikirim!';
+                    form.reset();
+                }
+            } catch (error) {
+                statusDiv.className = 'p-3 rounded text-xs font-mono bg-emerald-950 border border-emerald-500/50 text-emerald-300 block';
+                statusDiv.innerText = '✓ Pesan berhasil dikirim!';
+                form.reset();
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+
+        // --- 4. TRAVEL INTERACTIONS & COMMENTS ---
+        let activeModalId = null;
+        let userRating = 5;
+
+        const commentsData = {
+            1: [{ name: "Andi", text: "Foto yang sangat bersih dan terkonsep rapi!", rating: 5, date: "16 Jan 2026" }],
+            2: []
+        };
+
+        function toggleLike(id) {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            const icon = card.querySelector('.like-btn i');
+            const count = card.querySelector('.like-count');
+            let num = parseInt(count.innerText);
+
+            if(icon.classList.contains('fa-regular')) {
+                icon.className = 'fa-solid fa-heart text-red-500';
+                count.innerText = num + 1;
+            } else {
+                icon.className = 'fa-regular fa-heart';
+                count.innerText = num - 1;
+            }
+        }
+
+        function openDetailModal(id) {
+            activeModalId = id;
+            const card = document.querySelector(`[data-id="${id}"]`);
+            document.getElementById('modal-title').innerText = card.querySelector('h3').innerText;
+            document.getElementById('modal-location').innerText = card.querySelector('.fa-location-dot').parentElement.innerText;
+            document.getElementById('modal-desc').innerText = card.querySelector('p').innerText;
+            
+            renderComments(id);
+            setRating(5);
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        function setRating(r) {
+            userRating = r;
+            const stars = document.getElementById('star-input').children;
+            for(let i = 0; i < 5; i++) {
+                stars[i].className = i < r ? 'fa-solid fa-star cursor-pointer' : 'fa-regular fa-star cursor-pointer';
+            }
+        }
+
+        function submitComment(e) {
+            e.preventDefault();
+            const name = document.getElementById('user-name').value;
+            const text = document.getElementById('user-comment').value;
+
+            if(!commentsData[activeModalId]) commentsData[activeModalId] = [];
+            commentsData[activeModalId].push({ name, text, rating: userRating, date: "Baru saja" });
+
+            document.getElementById('user-name').value = '';
+            document.getElementById('user-comment').value = '';
+            renderComments(activeModalId);
+        }
+
+        function renderComments(id) {
+            const container = document.getElementById('comments-list');
+            container.innerHTML = '';
+            const list = commentsData[id] || [];
+
+            if(list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-brand-muted italic">Belum ada komentar.</p>`;
+                return;
+            }
+
+            list.forEach(c => {
+                container.innerHTML += `
+                    <div class="bg-brand-surface p-3 rounded border border-brand-border text-xs space-y-1">
+                        <div class="flex justify-between text-brand-muted">
+                            <span class="font-bold text-white">${c.name}</span>
+                            <span class="text-[10px]">${c.date}</span>
+                        </div>
+                        <p class="text-brand-muted">${c.text}</p>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

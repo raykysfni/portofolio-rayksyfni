@@ -1,0 +1,11 @@
+- Mengubah Gambar Slideshow Cari tag <img> di dalam elemen <div id="hero-slideshow"> (sekitar baris 70-76) dan ganti URL src="..." 
+
+- Mengubah Video Background Cari tag <source> di dalam elemen <video id="hero-video"> (sekitar baris 81) dan ganti URL src="..." dengan link video mp4 milik Anda.
+
+- Mengatur Durasi Slideshow & Jumlah Putaran Buka kode JavaScript bagian bawah (sekitar baris 373-375):
+
+- maxLoops = 2: Berapa kali slideshow mengulang 3 foto tersebut sebelum otomatis berubah menjadi video.
+
+slideIntervalTime = 3000: Durasi perpindahan tiap foto (3000 berarti 3 detik).
+
+- tautan embed dari Google Maps Web (Pilih menu Bagikan / Share > Sematkan Peta / Embed a map > Salin HTML).

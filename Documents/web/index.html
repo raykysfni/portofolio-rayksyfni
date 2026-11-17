@@ -2,8 +2,32 @@
 <html lang="id" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta id="viewport-meta" name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Muhammad Raya Kasyafani — Digital Portfolio & Admin</title>
+
+    <!-- Inisialisasi Tema & Mode Layar Sesi Sebelum Halaman Render (Anti Kedip & Bertahan Saat Refresh) -->
+    <script>
+        (function() {
+            // 1. Tema default selalu CERAH (light) saat baru dibuka, bertahan selama tab belum ditutup (sessionStorage)
+            const sessionTheme = sessionStorage.getItem('session_theme') || 'light';
+            if (sessionTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
+            }
+
+            // 2. Mode layar bertahan saat refresh dalam satu sesi tab
+            const sessionView = sessionStorage.getItem('session_view_mode');
+            const vpMeta = document.getElementById('viewport-meta');
+            if (sessionView === 'desktop' && vpMeta) {
+                vpMeta.setAttribute('content', 'width=1100');
+            } else if (sessionView === 'mobile' && vpMeta) {
+                vpMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+            }
+        })();
+    </script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -134,9 +158,9 @@
         </div>
     </div>
 
-    <!-- ==================== 2. LEFT SIDEBAR NAVIGATION ==================== -->
-    <aside id="sidebar-nav" class="w-full md:w-64 bg-white/80 dark:bg-apple-darkcard/80 backdrop-blur-md border-r border-apple-border dark:border-apple-darkborder md:fixed md:h-screen flex flex-col justify-between p-6 z-30">
-        <div class="space-y-6">
+    <!-- ==================== 2. LEFT / TOP SIDEBAR NAVIGATION ==================== -->
+    <aside id="sidebar-nav" class="w-full md:w-64 bg-white/80 dark:bg-apple-darkcard/80 backdrop-blur-md border-b md:border-b-0 md:border-r border-apple-border dark:border-apple-darkborder md:fixed md:h-screen flex flex-col justify-between p-4 md:p-6 z-30">
+        <div class="space-y-4 md:space-y-6">
             <!-- Header Sidebar (Klik RK 3x untuk memunculkan Admin Login) -->
             <div class="flex items-center justify-between">
                 <a href="#" onclick="handleLogoClick(event)" class="flex items-center gap-3 overflow-hidden select-none cursor-pointer" title="Klik 3x untuk login Admin">
@@ -146,43 +170,49 @@
                         <span class="text-[10px] text-apple-subtext font-mono">Portfolio 2026</span>
                     </div>
                 </a>
-                <button onclick="toggleSidebarCompact()" title="Perkecil / Perbesar Sidebar" class="text-apple-subtext hover:text-apple-text p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all shrink-0">
-                    <i class="fa-solid fa-angles-left text-xs" id="sidebar-toggle-icon"></i>
-                </button>
+                <div class="flex items-center gap-1">
+                    <!-- Tombol Pengaturan Tampilan Cepat di Mobile -->
+                    <button onclick="openVisitorSettings()" title="Tampilan Web" class="md:hidden text-apple-subtext hover:text-apple-text p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                        <i class="fa-solid fa-sliders text-xs"></i>
+                    </button>
+                    <button onclick="toggleSidebarCompact()" id="sidebar-collapse-btn" title="Perkecil / Perbesar Sidebar" class="hidden md:block text-apple-subtext hover:text-apple-text p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all shrink-0">
+                        <i class="fa-solid fa-angles-left text-xs" id="sidebar-toggle-icon"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Menu Navigasi Pengunjung -->
-            <nav class="flex md:flex-col space-x-2 md:space-x-0 md:space-y-1 overflow-x-auto pb-2 md:pb-0 text-xs font-medium">
-                <button onclick="switchTab('home')" id="nav-home" title="Home" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all active">
+            <nav id="sidebar-menu-list" class="flex md:flex-col space-x-2 md:space-x-0 md:space-y-1 overflow-x-auto pb-1 md:pb-0 text-xs font-medium">
+                <button onclick="switchTab('home')" id="nav-home" title="Home" class="nav-btn whitespace-nowrap md:w-full flex items-center gap-2.5 md:gap-3 px-3.5 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all active">
                     <i class="fa-solid fa-house w-4 text-center shrink-0"></i> 
                     <span class="nav-text truncate">Home</span>
                 </button>
-                <button onclick="switchTab('about')" id="nav-about" title="About Me" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                <button onclick="switchTab('about')" id="nav-about" title="About Me" class="nav-btn whitespace-nowrap md:w-full flex items-center gap-2.5 md:gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                     <i class="fa-solid fa-user w-4 text-center shrink-0"></i> 
                     <span class="nav-text truncate">About Me</span>
                 </button>
-                <button onclick="switchTab('projects')" id="nav-projects" title="My Projects" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                <button onclick="switchTab('projects')" id="nav-projects" title="My Projects" class="nav-btn whitespace-nowrap md:w-full flex items-center gap-2.5 md:gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                     <i class="fa-solid fa-folder-open w-4 text-center shrink-0"></i> 
                     <span class="nav-text truncate">My Projects</span>
                 </button>
-                <button onclick="switchTab('journey')" id="nav-journey" title="My Journey" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                <button onclick="switchTab('journey')" id="nav-journey" title="My Journey" class="nav-btn whitespace-nowrap md:w-full flex items-center gap-2.5 md:gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                     <i class="fa-solid fa-compass w-4 text-center shrink-0"></i> 
                     <span class="nav-text truncate">My Journey</span>
                 </button>
-                <button onclick="switchTab('contact')" id="nav-contact" title="Contact" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                <button onclick="switchTab('contact')" id="nav-contact" title="Contact" class="nav-btn whitespace-nowrap md:w-full flex items-center gap-2.5 md:gap-3 px-3.5 py-2.5 rounded-xl text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                     <i class="fa-solid fa-paper-plane w-4 text-center shrink-0"></i> 
                     <span class="nav-text truncate">Contact</span>
                 </button>
                 
                 <!-- Tombol Admin HANYA muncul jika sudah terotentikasi Firebase -->
-                <button onclick="openAdminTab()" id="nav-admin" title="Admin Dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-apple-accent hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-all font-semibold mt-4 border border-blue-200 dark:border-blue-900 hidden">
+                <button onclick="openAdminTab()" id="nav-admin" title="Admin Dashboard" class="nav-btn whitespace-nowrap md:w-full flex items-center gap-2.5 md:gap-3 px-3.5 py-2.5 rounded-xl text-apple-accent hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-all font-semibold md:mt-4 border border-blue-200 dark:border-blue-900 hidden">
                     <i class="fa-solid fa-shield-halved w-4 text-center shrink-0"></i> 
                     <span class="nav-text truncate">Admin Dashboard</span>
                 </button>
             </nav>
         </div>
 
-        <div class="pt-4 border-t border-apple-border dark:border-apple-darkborder mt-auto">
+        <div id="sidebar-footer-settings" class="pt-3 md:pt-4 border-t border-apple-border dark:border-apple-darkborder mt-3 md:mt-auto">
             <button onclick="openVisitorSettings()" title="Tampilan Web" class="nav-btn w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs text-apple-subtext hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                 <span class="flex items-center gap-2 truncate">
                     <i class="fa-solid fa-sliders shrink-0"></i> 
@@ -194,16 +224,16 @@
     </aside>
 
     <!-- ==================== 3. MAIN CONTENT AREA ==================== -->
-    <main id="main-content" class="flex-1 md:ml-64 p-6 md:p-12 max-w-6xl mx-auto w-full transition-all">
+    <main id="main-content" class="flex-1 md:ml-64 p-5 md:p-12 max-w-6xl mx-auto w-full transition-all">
 
         <!-- TAB 1: HOME -->
         <section id="tab-home" class="tab-content active space-y-12">
-            <div class="bg-white dark:bg-apple-darkcard border border-apple-border dark:border-apple-darkborder rounded-3xl p-8 md:p-12 shadow-sm relative overflow-hidden">
+            <div class="bg-white dark:bg-apple-darkcard border border-apple-border dark:border-apple-darkborder rounded-3xl p-6 md:p-12 shadow-sm relative overflow-hidden">
                 <div class="max-w-2xl space-y-6 relative z-10">
-                    <span id="display-hero-badge" class="px-3 py-1 bg-blue-50 dark:bg-blue-950/50 text-apple-accent text-xs font-semibold rounded-full border border-blue-100 dark:border-blue-900">
+                    <span id="display-hero-badge" class="px-3 py-1 bg-blue-50 dark:bg-blue-950/50 text-apple-accent text-xs font-semibold rounded-full border border-blue-100 dark:border-blue-900 inline-block">
                         Siswa SMA & Pengembara Digital
                     </span>
-                    <h1 class="font-jakarta text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+                    <h1 class="font-jakarta text-3xl md:text-6xl font-extrabold tracking-tight leading-tight">
                         Desain Sederhana, <br>
                         <span class="text-apple-accent">Pengalaman Bermakna.</span>
                     </h1>
@@ -405,7 +435,7 @@
 
         <!-- ==================== TAB 6: ADMIN DASHBOARD ==================== -->
         <section id="tab-admin" class="tab-content space-y-8">
-            <div class="flex justify-between items-center border-b border-apple-border dark:border-apple-darkborder pb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-apple-border dark:border-apple-darkborder pb-6">
                 <div>
                     <span class="text-xs font-mono uppercase tracking-widest text-apple-accent font-semibold">// CONTROL PANEL</span>
                     <h1 class="font-jakarta text-3xl md:text-4xl font-extrabold mt-1">Admin Dashboard</h1>
@@ -748,10 +778,10 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
             <div class="space-y-2">
                 <label class="text-xs font-mono text-apple-subtext uppercase">Tema Warna Website</label>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setTheme('light')" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
+                    <button onclick="setTheme('light')" id="btn-theme-light" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
                         <i class="fa-solid fa-sun text-amber-500"></i> Mode Cerah
                     </button>
-                    <button onclick="setTheme('dark')" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
+                    <button onclick="setTheme('dark')" id="btn-theme-dark" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
                         <i class="fa-solid fa-moon text-indigo-400"></i> Mode Gelap
                     </button>
                 </div>
@@ -760,13 +790,14 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
             <div class="space-y-2">
                 <label class="text-xs font-mono text-apple-subtext uppercase">Mode Tampilan Layar</label>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setViewMode('desktop')" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
+                    <button onclick="setViewMode('desktop')" id="btn-view-desktop" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
                         <i class="fa-solid fa-desktop"></i> Komputer
                     </button>
-                    <button onclick="setViewMode('mobile')" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
+                    <button onclick="setViewMode('mobile')" id="btn-view-mobile" class="py-2.5 px-3 bg-apple-bg dark:bg-apple-darkbg border border-apple-border dark:border-apple-darkborder rounded-xl text-xs font-medium flex items-center justify-center gap-2">
                         <i class="fa-solid fa-mobile-screen"></i> Mode HP
                     </button>
                 </div>
+                <p class="text-[10px] text-apple-subtext italic pt-1">*Pilih "Komputer" untuk tampilan luas ala desktop saat membuka dari HP.</p>
             </div>
         </div>
     </div>
@@ -1400,14 +1431,12 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
         };
 
         // SISTEM OTENTIKASI LENGKAP (FIREBASE AUTH + QUICK PIN UNLOCK)
-        // Shortcut rahasia keyboard: Alt + Shift + A
         document.addEventListener('keydown', (e) => {
             if (e.altKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
                 window.openAdminTab();
             }
         });
 
-        // Klik 3x pada logo RK untuk membuka login Admin
         let logoClickCount = 0;
         let logoClickTimer = null;
         window.handleLogoClick = function(e) {
@@ -1451,13 +1480,11 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
             modal.classList.remove('hidden');
 
             if (currentUser && !isDashboardUnlocked) {
-                // Sesi Login Firebase aktif, butuh PIN cepat
                 title.innerText = "Buka Kunci Layar Admin";
                 sub.innerText = "Masukkan PIN 4-digit Anda untuk melanjutkan.";
                 formFull.classList.add('hidden');
                 formPin.classList.remove('hidden');
             } else {
-                // Belum login Firebase
                 title.innerText = "Login Administrator";
                 sub.innerText = "Masukkan Email & Password Firebase Admin.";
                 formFull.classList.remove('hidden');
@@ -1502,7 +1529,6 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
             e.preventDefault();
             const pin = document.getElementById('admin-pin').value;
 
-            // Default PIN: 1234
             if (pin === '1234') {
                 isDashboardUnlocked = true;
                 localStorage.setItem('admin_unlocked', 'true');
@@ -1536,7 +1562,7 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
         };
 
 
-        // NAVIGATION LOGIC WITH BROWSER HISTORY (BACK/FORWARD) SUPPORT
+        // NAVIGATION LOGIC WITH SESSION PERSISTENCE (BERTAHAN SAAT REFRESH, RESET SAAT DIBUKA ULANG DARI AWAL)
         const typingText = document.getElementById('typing-text');
         const phrases = ["Muhammad Raya Kasyafani", "Web Enthusiast", "Digital Traveler"];
         let phraseIdx = 0, charIdx = 0, isDeleting = false;
@@ -1554,7 +1580,9 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
             const intro = document.getElementById('intro-screen');
             intro.style.opacity = '0';
             setTimeout(() => intro.style.display = 'none', 700);
-            localStorage.setItem('has_seen_intro', 'true');
+            sessionStorage.setItem('session_seen_intro', 'true');
+            window.switchTab('home', false);
+            history.replaceState({ tab: 'home' }, '', '#home');
         };
 
         function renderTabContent(tabId) {
@@ -1573,7 +1601,7 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
                 activeBtn.classList.remove('text-apple-subtext');
             }
 
-            localStorage.setItem('active_tab', tabId);
+            sessionStorage.setItem('session_active_tab', tabId);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1605,19 +1633,36 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
 
         window.addEventListener('DOMContentLoaded', () => {
             updateAdminVisibility();
-            const savedTab = window.location.hash.replace('#', '') || localStorage.getItem('active_tab') || 'home';
-            const hasSeenIntro = localStorage.getItem('has_seen_intro');
 
-            if (hasSeenIntro === 'true') {
-                const intro = document.getElementById('intro-screen');
-                if (intro) intro.style.display = 'none';
+            // Terapkan kembali tema & mode layar yang tersimpan selama sesi aktif (bertahan saat di-refresh)
+            const currentTheme = sessionStorage.getItem('session_theme') || 'light';
+            window.setTheme(currentTheme, false);
+
+            const savedViewMode = sessionStorage.getItem('session_view_mode');
+            if (savedViewMode) {
+                window.setViewMode(savedViewMode, false);
+            } else {
+                updateSettingsButtonHighlight();
             }
 
-            if (savedTab === 'admin' && (!currentUser || !isDashboardUnlocked)) {
-                window.switchTab('home', false);
+            // Cek apakah ini sesi refresh (tab belum ditutup) atau baru membuka website dari awal
+            const hasSeenIntro = sessionStorage.getItem('session_seen_intro') === 'true';
+
+            if (hasSeenIntro) {
+                const intro = document.getElementById('intro-screen');
+                if (intro) intro.style.display = 'none';
+
+                const savedTab = window.location.hash.replace('#', '') || sessionStorage.getItem('session_active_tab') || 'home';
+                if (savedTab === 'admin' && (!currentUser || !isDashboardUnlocked)) {
+                    window.switchTab('home', false);
+                } else {
+                    window.switchTab(savedTab, false);
+                }
             } else {
-                window.switchTab(savedTab, false);
-                history.replaceState({ tab: savedTab }, '', `#${savedTab}`);
+                // Baru membuka website dari awal: tampilkan layar sambutan & mulai dari Home dengan tema Cerah
+                window.location.hash = '';
+                window.switchTab('home', false);
+                history.replaceState({ tab: 'home' }, '', window.location.pathname);
             }
         });
 
@@ -1634,26 +1679,79 @@ https://www.w3schools.com/html/mov_bbb.mp4" class="w-full bg-apple-bg dark:bg-ap
             activeSub.classList.remove('text-apple-subtext');
         };
 
-        window.openVisitorSettings = function() { document.getElementById('visitor-settings-modal').classList.remove('hidden'); };
+        window.openVisitorSettings = function() {
+            updateSettingsButtonHighlight();
+            document.getElementById('visitor-settings-modal').classList.remove('hidden');
+        };
         window.closeVisitorSettings = function() { document.getElementById('visitor-settings-modal').classList.add('hidden'); };
 
-        window.setTheme = function(mode) {
-            if(mode === 'dark') document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
+        function updateSettingsButtonHighlight() {
+            const activeTheme = sessionStorage.getItem('session_theme') || 'light';
+            const activeView = sessionStorage.getItem('session_view_mode') || (window.innerWidth < 768 ? 'mobile' : 'desktop');
+
+            const lightBtn = document.getElementById('btn-theme-light');
+            const darkBtn = document.getElementById('btn-theme-dark');
+            const deskBtn = document.getElementById('btn-view-desktop');
+            const mobBtn = document.getElementById('btn-view-mobile');
+
+            [lightBtn, darkBtn, deskBtn, mobBtn].forEach(btn => {
+                if (btn) btn.classList.remove('ring-2', 'ring-apple-accent', 'font-bold');
+            });
+
+            if (activeTheme === 'dark' && darkBtn) darkBtn.classList.add('ring-2', 'ring-apple-accent', 'font-bold');
+            if (activeTheme === 'light' && lightBtn) lightBtn.classList.add('ring-2', 'ring-apple-accent', 'font-bold');
+            if (activeView === 'desktop' && deskBtn) deskBtn.classList.add('ring-2', 'ring-apple-accent', 'font-bold');
+            if (activeView === 'mobile' && mobBtn) mobBtn.classList.add('ring-2', 'ring-apple-accent', 'font-bold');
+        }
+
+        window.setTheme = function(mode, save = true) {
+            if (mode === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+            if (save) {
+                sessionStorage.setItem('session_theme', mode);
+            }
+            updateSettingsButtonHighlight();
         };
 
-        window.setViewMode = function(mode) {
+        window.setViewMode = function(mode, shouldCloseModal = true) {
+            const body = document.getElementById('main-body');
             const sidebar = document.getElementById('sidebar-nav');
+            const menuList = document.getElementById('sidebar-menu-list');
+            const footerSettings = document.getElementById('sidebar-footer-settings');
+            const collapseBtn = document.getElementById('sidebar-collapse-btn');
             const main = document.getElementById('main-content');
+            const vpMeta = document.getElementById('viewport-meta');
 
-            if(mode === 'mobile') {
-                sidebar.className = "w-full max-w-sm mx-auto border bg-white dark:bg-apple-darkcard p-4 rounded-2xl mb-6 flex flex-col justify-between";
-                main.className = "flex-1 max-w-sm mx-auto p-4 w-full";
+            sessionStorage.setItem('session_view_mode', mode);
+
+            if (mode === 'mobile') {
+                if (vpMeta) vpMeta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+                body.className = "bg-apple-bg dark:bg-apple-darkbg text-apple-text dark:text-apple-darktext min-h-screen flex flex-col antialiased selection:bg-apple-accent selection:text-white pb-24 max-w-md mx-auto shadow-2xl border-x border-apple-border dark:border-apple-darkborder";
+                sidebar.className = "w-full bg-white/80 dark:bg-apple-darkcard/80 backdrop-blur-md border-b border-apple-border dark:border-apple-darkborder flex flex-col justify-between p-4 z-30";
+                menuList.className = "flex space-x-2 overflow-x-auto pb-1 text-xs font-medium";
+                footerSettings.className = "pt-3 border-t border-apple-border dark:border-apple-darkborder mt-3";
+                if (collapseBtn) collapseBtn.classList.add('hidden');
+                main.className = "flex-1 p-5 w-full transition-all";
             } else {
-                sidebar.className = "w-full md:w-64 bg-white/80 dark:bg-apple-darkcard/80 backdrop-blur-md border-r border-apple-border dark:border-apple-darkborder md:fixed md:h-screen flex flex-col justify-between p-6 z-30 transition-all";
-                main.className = "flex-1 md:ml-64 p-6 md:p-12 max-w-6xl mx-auto w-full transition-all";
+                // Mode Komputer: perlebar viewport ke 1100px agar di HP otomatis tampil luas seperti Desktop Chrome
+                if (vpMeta) vpMeta.setAttribute('content', 'width=1100');
+                body.className = "bg-apple-bg dark:bg-apple-darkbg text-apple-text dark:text-apple-darktext min-h-screen flex flex-row antialiased selection:bg-apple-accent selection:text-white pb-0";
+                sidebar.className = "w-64 bg-white/80 dark:bg-apple-darkcard/80 backdrop-blur-md border-r border-apple-border dark:border-apple-darkborder fixed h-screen flex flex-col justify-between p-6 z-30";
+                menuList.className = "flex flex-col space-y-1 text-xs font-medium";
+                footerSettings.className = "pt-4 border-t border-apple-border dark:border-apple-darkborder mt-auto";
+                if (collapseBtn) collapseBtn.classList.remove('hidden');
+                main.className = "flex-1 ml-64 p-12 max-w-6xl mx-auto w-full transition-all";
             }
-            window.closeVisitorSettings();
+
+            updateSettingsButtonHighlight();
+            if (shouldCloseModal) {
+                window.closeVisitorSettings();
+            }
         };
 
         window.handleContactSubmit = async function(e) {
